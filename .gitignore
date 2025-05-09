@@ -1,0 +1,8 @@
+**/__pycache__/
+.vscode/
+**/.DS_Store
+notebook/
+data/private/
+/scripts/workspace_zip_maker.py
+/scripts/*.zip
+.env

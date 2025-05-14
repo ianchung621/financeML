@@ -99,17 +99,17 @@ def _post_process_hit(hit_type: float, ret: float, neutral_class: bool, ret_thre
         return 1 if ret > ret_thresh else 0
 
 @njit
-def _evaluate_event_instance(price: np.ndarray, step: float, tpsl: tuple, neutral_class: bool, ret_thresh: float, side: int):
+def _evaluate_event_instance(price: np.ndarray, step: float, tpsl: tuple, use_tpsl: bool, neutral_class: bool, ret_thresh: float, side: int):
     tp_val, sl_val = tpsl
     tp, sl, tp_active = _compute_barrier_level(price[0], step, tp_val, sl_val, side)
     t1, hit_type = _compute_barrier_hit(price, tp, sl, tp_active, side)
-    ret = _calculate_return(price, t1, hit_type, tp, sl, tp_active, side)
+    ret = _calculate_return(price, t1, hit_type, tp, sl, use_tpsl, side)
     label = _post_process_hit(hit_type, ret, neutral_class, ret_thresh)
     return t1, label, ret
 
 @njit(parallel=True)
 def _evaluate_event(prices: np.ndarray, steps: np.ndarray, 
-                    tpsl: tuple, neutral_class: bool, ret_thresh: float, sides: np.ndarray):
+                    tpsl: tuple, use_tpsl: bool, neutral_class: bool, ret_thresh: float, sides: np.ndarray):
     N = prices.shape[0]
     t1s = np.full(N, np.nan)
     labels = np.full(N, np.nan)
@@ -118,7 +118,7 @@ def _evaluate_event(prices: np.ndarray, steps: np.ndarray,
     for i in prange(N):
         price = prices[i]
         step = steps[i]
-        t1, label, ret = _evaluate_event_instance(price, step, tpsl, neutral_class, ret_thresh, sides[i])
+        t1, label, ret = _evaluate_event_instance(price, step, tpsl, use_tpsl, neutral_class, ret_thresh, sides[i])
         t1s[i] = t1
         labels[i] = label
         rets[i] = ret

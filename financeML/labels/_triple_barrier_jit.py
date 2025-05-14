@@ -108,7 +108,8 @@ def _evaluate_event_instance(price: np.ndarray, step: float, tpsl: tuple, neutra
     return t1, label, ret
 
 @njit(parallel=True)
-def _evaluate_event(prices: np.ndarray, steps: np.ndarray, tpsl: tuple, neutral_class: bool, ret_thresh: float, side: int):
+def _evaluate_event(prices: np.ndarray, steps: np.ndarray, 
+                    tpsl: tuple, neutral_class: bool, ret_thresh: float, sides: np.ndarray):
     N = prices.shape[0]
     t1s = np.full(N, np.nan)
     labels = np.full(N, np.nan)
@@ -117,7 +118,7 @@ def _evaluate_event(prices: np.ndarray, steps: np.ndarray, tpsl: tuple, neutral_
     for i in prange(N):
         price = prices[i]
         step = steps[i]
-        t1, label, ret = _evaluate_event_instance(price, step, tpsl, neutral_class, ret_thresh, side)
+        t1, label, ret = _evaluate_event_instance(price, step, tpsl, neutral_class, ret_thresh, sides[i])
         t1s[i] = t1
         labels[i] = label
         rets[i] = ret

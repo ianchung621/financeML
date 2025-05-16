@@ -16,7 +16,7 @@ def _compute_barrier_level(price: float, step: float, tp_val: float, sl_val: flo
 def _compute_barrier_hit_with_tp(price: np.ndarray, tp: float, sl: float, side: int):
     TP_HIT = 2
     UNCLOSED = 1
-    SL_HIT = 0
+    SL_HIT = 0 
 
     T = len(price)
     if np.isnan(price[0]) or np.isnan(tp) or np.isnan(sl):
@@ -124,8 +124,6 @@ def _evaluate_event(prices: np.ndarray, steps: np.ndarray,
         rets[i] = ret
 
     return t1s, labels, rets
-
-
 
 
 

@@ -20,7 +20,7 @@ def compute_event_weights(label_df:pd.DataFrame, price_df:pd.DataFrame, weight_b
 
     Returns
     -------
-    weights_df: pd.DataFrame
+    weights_df : pd.DataFrame
         Index: aligned with label_df
         Columns:
         - 'uniqueness'

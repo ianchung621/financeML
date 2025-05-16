@@ -80,7 +80,7 @@ def evaluate_trade_result(
 
     Returns
     -------
-    pd.DataFrame
+    label_df : pd.DataFrame
         Labeled trade outcomes with columns:
         - 'stock_id': from `event_df`
         - 'entry_date': Timestamp when trade is entered (t or t+1)

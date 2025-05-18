@@ -101,7 +101,7 @@ def evaluate_trade_result(
   * `0`: stop-loss hit
 * If `tpsl` and `step_df` are both `None`, price barriers default to √window scaling
   `tpsl = (√window, √window)`, consistent with Brownian motion:
-  $\Delta \text{price} \sim \sigma \sqrt{T}$
+  Δprice ~ σ√T
 
 **Returns**
 

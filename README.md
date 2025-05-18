@@ -1,6 +1,10 @@
 # 📘 finance ML
 
-Implementation of techniques from for *Advances in Financial Machine Learning* by Marcos López de Prado, supporting multi-asset evaluation using JIT-parallel computation.
+Implementation of techniques from for [*Advances in Financial Machine Learning*](https://www.wiley.com/en-fr/Advances+in+Financial+Machine+Learning-p-9781119482109) by Marcos López de Prado
+
+<p align="center">
+  <img src="https://www.wiley.com/storefront-pdp-assets/_next/image?url=https%3A%2F%2Fmedia.wiley.com%2Fproduct_data%2FcoverImage300%2F89%2F11194820%2F1119482089.jpg&w=640&q=75" alt="Advances in Financial Machine Learning" width="200"/>
+</p>
 
 ## 🗂️ Project Structure
 

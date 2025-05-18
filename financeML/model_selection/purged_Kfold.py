@@ -66,7 +66,7 @@ class PurgedKFold:
         """
         assert event_df.index.equals(label_df.index), "Index mismatch between event_df and label_df"
 
-        valid_mask = label_df['label'].notna()
+        valid_mask = label_df.notna().all(axis=1)
         event_df = event_df.loc[valid_mask]
         label_df = label_df.loc[valid_mask]
 

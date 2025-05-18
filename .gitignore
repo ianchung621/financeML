@@ -4,6 +4,7 @@
 notebook/
 dev/
 data/private/
-/scripts/workspace_zip_maker.py
-/scripts/*.zip
+financeML/database/
+scripts/workspace_zip_maker.py
+scripts/*.zip
 .env

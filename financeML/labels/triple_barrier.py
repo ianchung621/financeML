@@ -10,7 +10,7 @@ def evaluate_trade_result(
     price_df: pd.DataFrame,
     step_df: pd.DataFrame | None = None,
     lookback: int = 64,
-    tpsl: Tuple[float, float] = (1, 1),
+    tpsl: Tuple[float, float] | None = None,
     use_tpsl: bool = False,
     neutral_class: bool = True,
     ret_thresh: float = 0.01,
@@ -44,11 +44,20 @@ def evaluate_trade_result(
     lookback: int, default=64
         Only used when `step_df=None`. Number of past timesteps to calculate rolling volatility
 
-    tpsl : tuple of (tp, sl), default=(1, 1)
-        Take-profit and stop-loss multipliers:
-        - `tp`: sets the upper threshold at `price + tp * step` (long) or `price - tp * step` (short)
-        - `sl`: sets the lower threshold
-        - To disable take-profit, use `tp = 0` (i.e., `tpsl = (0, sl)`)
+    tpsl : tuple[float, float] | None, default=None
+        Take-profit and stop-loss multipliers applied to the `step` size (e.g., volatility or ATR):
+
+        - For long trades:  
+          - TP barrier = `price + tp * step`
+          - SL barrier = `price - sl * step`
+        - For short trades:  
+          - TP barrier = `price - tp * step`
+          - SL barrier = `price + sl * step`
+
+        Use `tp = 0` to disable take-profit evaluation (e.g., `tpsl=(0, 2)`).
+
+        If set to `None` and `step_df` is also `None`, the default is dynamically computed as:
+        `tpsl = (√window, √window)`, which aligns with the expected return distribution under Brownian motion.
     
     use_tpsl : bool, default=False
         If True: use the actual TP/SL levels as the exit price when a barrier is hit.
@@ -97,11 +106,22 @@ def evaluate_trade_result(
       starts at `price(t+1)` if `trade_next=True`, otherwise from `price(t)`.
     - To disable the take-profit condition and only evaluate stop-loss (or final return),
       set `tp = 0` in the `tpsl` parameter (e.g., `tpsl=(0, 2)`).
+    - If `tpsl=None` and `step_df=None`, the take-profit and stop-loss thresholds default to
+      `(√window, √window)`. This choice reflects the empirical behavior of returns under
+      Brownian motion (`σ√T`) and is intended to generate balanced class labels across TP, SL, and unclosed.
+    - If `step_df` is explicitly provided, `tpsl` must also be explicitly set to avoid ambiguity.
     - The `use_tpsl` parameter controls whether the exit price is set to the barrier level (TP/SL),
       or the actual price at the time the barrier is triggered. Default is `False` to reflect
       realistic execution, since trades may not occur at the exact threshold price in illiquid or
       discrete markets.
     """
+
+    # handle tpsl
+    if tpsl is None:
+        if step_df is None:
+            tpsl = (np.sqrt(window), np.sqrt(window))
+        else:
+            raise ValueError("tpsl must be explicitly set if step_df is provided.")
 
     # get aligned signal windows
     if step_df is None:
@@ -134,9 +154,9 @@ def evaluate_trade_result(
     nan_mask = np.isnan(t1s)
     t1s_int = np.where(nan_mask, -1, t1s).astype(np.int32)
     exit_idx = entry_idx + t1s_int
-    
+
     # bounds check & t1 validation
-    valid_entry = (entry_idx >= 0) & (entry_idx < len(date_index)) & ~nan_mask
+    valid_entry = (entry_idx >= 0) & (entry_idx < len(date_index))
     valid_exit = (exit_idx >= 0) & (exit_idx < len(date_index)) & ~nan_mask
 
     entry_dates = np.full(N, np.datetime64('NaT'), dtype='datetime64[ns]')
